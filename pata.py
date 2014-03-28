@@ -18,7 +18,7 @@ def run(args):
 		else:
 			pairs.append(pair)
 
-	command = ['parallel', '--xapply', '-j2', './pipeline.py', ':::']
+	command = ['parallel', '--xapply', '--eta', './assemble.py', ':::']
 	command += [pair[0] for pair in pairs]
 	command.append(':::')
 	command += [pair[1] for pair in pairs]
