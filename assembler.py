@@ -1,10 +1,13 @@
 #!/usr/local/bin/python3
 
+import os
+import re
+import subprocess
+import sys
+
 def run(args):
-	import os
 	directory = os.getcwd() if len(args) < 2 else args[1]
 
-	import re
 	matches = [i for i in os.listdir(directory) if re.match('^.*_R1(_001)?\.fastq\.gz', i)]
 	possible_pairs = [(os.path.join(directory, i), os.path.join(directory, re.sub(r'(.+)_R1(.+)', r'\1_R2\2', i))) for i in matches]
 
@@ -15,9 +18,12 @@ def run(args):
 		else:
 			pairs.append(pair)
 
-	import subprocess
-	subprocess.call(['parallel', '--gnu', '-j2', './pipeline.py', ':::'] + ['{},{}'.format(*pair) for pair in pairs])
+	command = ['parallel', '--xapply', '-j2', './pipeline.py', ':::']
+	command += [pair[0] for pair in pairs]
+	command.append(':::')
+	command += [pair[1] for pair in pairs]
+
+	subprocess.call(command)
 
 if __name__ == '__main__':
-	import sys
 	run(sys.argv)

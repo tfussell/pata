@@ -49,7 +49,9 @@ def trans_abyss_rmdups(working_directory, root_name, out_file):
 	out_file.write(out.decode('utf8'))
 
 def run(args):
-	file1, file2 = args[1].split(',')
+	file1, file2 = args[1], args[2]
+	print(file1, file2)
+	return
 	working_directory = os.path.dirname(file1)
 	file1, file2 = os.path.basename(file1), os.path.basename(file2)
 	
@@ -74,7 +76,7 @@ def run(args):
 	#shutil.rmtree(ta_directory)
 
 if __name__ == '__main__':
-	if len(sys.argv) < 2:
-		print("Usage: pipeline.py file1,file2")
+	if len(sys.argv) != 3:
+		print("Usage: pipeline.py file1 file2")
 	else:
 		run(sys.argv)
