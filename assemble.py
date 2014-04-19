@@ -16,7 +16,8 @@ trans_abyss_fem_bin = os.path.join(trans_abyss_dir,'wrappers/abyss-ta-filter')
 trans_abyss_rmdups_bin = os.path.join(trans_abyss_dir, 'wrappers/abyss-rmdups-iterative')
 
 def trim_galore(working_directory, file1, file2, out_file):
-    command = trim_galore_bin + ' -a {} -a2 {} --paired {} {}'.format(adapter1, adapter2, file1, file2)
+    command = '/usr/bin/perl ' + trim_galore_bin + ' -a {} -a2 {} --paired {} {}'.format(adapter1, adapter2, file1, file2)
+    print('\'' + command + '\'')
     out = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True, cwd=working_directory)
     out_file.write(out.decode('utf8', 'ignore'))
 
@@ -33,17 +34,23 @@ def trim_galore(working_directory, file1, file2, out_file):
     return new_file1, new_file2
 
 def abyss(working_directory, file1, file2, kmer, root_name, kmer_directory, out_file):
-    command = 'source {}; {} -C {} s=150 n=5 k={} in=\'../../{} ../../{}\' name={}'.format(trans_abyss_env, abyss_bin, kmer_directory, kmer, file1, file2, root_name)
-    out = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True, cwd=working_directory)
-    out_file.write(out.decode('utf8', 'ignore'))
+    command = 'source {}; {} -C {} s=150 n=5 k={} name={} in=\'../../{} ../../{}\''.format(trans_abyss_env, abyss_bin, kmer_directory, kmer, root_name, file1, file2)
+    print(command)
+    try:
+        out = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True, cwd=working_directory)
+        out_file.write(out.decode('utf8', 'ignore'))
+    except subprocess.CalledProcessError as e:
+        pass
 
 def trans_abyss_fem(working_directory, file1, file2, kmer, root_name, kmer_directory, out_file):
     command = 'source {}; {} -i {} -k {} -n {} -o {} -l 151'.format(trans_abyss_env, trans_abyss_fem_bin, kmer_directory, kmer, root_name, kmer_directory)
+    print(command)
     out = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True, cwd=working_directory)
     out_file.write(out.decode('utf8', 'ignore'))
 
 def trans_abyss_rmdups(working_directory, ta_directory, root_name, out_file):
     command = trans_abyss_rmdups_bin + ' -i {} -n {} -o {}'.format(ta_directory, root_name, ta_directory)
+    print(command)
     out = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True, cwd=working_directory)
     out_file.write(out.decode('utf8', 'ignore'))
 

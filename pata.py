@@ -18,7 +18,8 @@ def run(args):
 		else:
 			pairs.append(pair)
 
-	command = ['parallel', '--xapply', '-j12', './assemble.py', ':::']
+	assemble_bin = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'assemble.py')
+	command = ['parallel', '--xapply', '-j12', assemble_bin, ':::']
 	command += [pair[0] for pair in pairs]
 	command.append(':::')
 	command += [pair[1] for pair in pairs]
